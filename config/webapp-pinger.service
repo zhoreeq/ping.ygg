@@ -1,0 +1,14 @@
+[Unit]
+Description=webapp-pinger
+Wants=network.target
+After=network.target
+
+[Service]
+User=pinger
+Group=www-data
+UMask=0002
+WorkingDirectory=/var/www/pinger/src
+ExecStart=/usr/bin/env python3 /var/www/pinger/src/pinger.py /tmp/pinger_app.sock 
+
+[Install]
+WantedBy=multi-user.target

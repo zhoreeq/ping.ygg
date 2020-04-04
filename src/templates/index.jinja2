@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<style>
+    html, body { text-align: center; font-size: 1.2em; 
+        font-family: monospace; background: snow;}
+    .block { margin: 10px; padding: 10px;}
+    input, button { font-size: inherit; }
+</style>
+
+<body>
+
+    <div class="block">Your IP: {{ client_ip }}</div>
+        
+    <div class="block">
+        <form id="pinger" action="#">
+        Is
+        <input pattern="[a-z0-9.-:]{4,255}" required id="target" type="text" 
+                placeholder="IP or domain name">
+        down for everyone 
+        <button>or just me?</button>
+        </form>
+    </div>
+
+    <div id="result" class="block"></div>
+
+<script type="text/javascript">
+    function display_result(res) {
+        document.querySelector("#result").innerHTML = res;
+    }
+
+    var form = document.querySelector("#pinger");
+    form.onsubmit = function() {
+        display_result("Please wait...");
+
+        var target = document.querySelector("#target").value;
+        document.querySelector("#target").value = "";
+        var api_uri = document.location.pathname + "json/" + target;
+
+        var xhr = new XMLHttpRequest();
+        xhr.onload = function() { 
+            var resp = JSON.parse(this.responseText);
+            console.log(resp); 
+
+            var result = "";
+            if (resp.status === "ok") {
+                if (resp.state === "up") {
+                    result = "It's just you. "+ target +" is up.";
+                } else {
+                    result = "It's not just you! "+target +" is down.";
+                }
+            } else {
+                result = "Error: "+resp.message;
+            }
+            display_result(result);
+        }
+        xhr.open("GET", api_uri, true);
+        xhr.send();
+
+    }
+</script>
+</body>
+</html>
